@@ -111,6 +111,21 @@ check_cluster()
     echo "The CAPI cluster is provisioned."
 }
 
+check_cluster_pause()
+{
+    echo ">>> Check CAPI cluster is not paused..."
+    
+    paused=$(kubectl get clusters.cluster.x-k8s.io/local -n fleet-local -o yaml | yq '.spec.paused')
+    
+    if [ "$paused" != "true" ]; then
+        echo "CAPI cluster is not paused."
+        return
+    fi
+    
+    echo "CAPI cluster is paused!"
+    record_fail
+}
+
 check_machines()
 {
     local failed="false"
@@ -309,6 +324,7 @@ check_bundles
 check_harvester_bundle
 check_nodes
 check_cluster
+check_cluster_pause
 check_machines
 check_volumes
 check_attached_volumes
